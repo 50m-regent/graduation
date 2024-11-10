@@ -2,6 +2,7 @@ from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
 from benchmark import imdb_benchmark
 from utils import get_logger
+from customize_model import remove_positional_embeddings
 
 
 logger = get_logger(__name__)
@@ -13,13 +14,7 @@ def main() -> None:
     )
     tokenizer = AutoTokenizer.from_pretrained("google-bert/bert-base-uncased")
 
-    """
-    for _, module in model.named_modules():
-        if not isinstance(module, BertSdpaSelfAttention):
-            continue
-
-        module.position_embedding_type = None
-    """
+    model = remove_positional_embeddings(model)
 
     logger.info(model)
 
