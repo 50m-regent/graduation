@@ -1,0 +1,14 @@
+[tool.poetry]
+name = "graduation"
+version = "0.0.0"
+description = "graduation research"
+authors = ["Lenne Hirata"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.13"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
