@@ -1,24 +1,24 @@
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
-from benchmark import imdb_benchmark
+from benchmark import imdb_benchmark, imdb_feature_comparison
 from utils import get_logger
-from customize_model import remove_positional_embeddings
 
 
 logger = get_logger(__name__)
 
 
 def main() -> None:
-    model = AutoModelForSequenceClassification.from_pretrained(
+    model1 = AutoModelForSequenceClassification.from_pretrained(
         "google-bert/bert-base-uncased"
+    )
+    model2 = AutoModelForSequenceClassification.from_pretrained(
+        "google-bert/bert-base-uncased", position_embedding_type="none"
     )
     tokenizer = AutoTokenizer.from_pretrained("google-bert/bert-base-uncased")
 
-    model = remove_positional_embeddings(model)
+    imdb_feature_comparison(model1, model2, tokenizer)
 
-    logger.info(model)
-
-    imdb_benchmark(model, tokenizer)
+    imdb_benchmark(model1, tokenizer)
 
 
 if __name__ == "__main__":
