@@ -3,7 +3,11 @@ import torch
 from sklearn import metrics
 from tqdm import tqdm
 from tqdm.contrib.logging import logging_redirect_tqdm
-from transformers import AutoModel, AutoTokenizer
+from transformers import (
+    AutoModelForSequenceClassification,
+    AutoModelForCausalLM,
+    AutoTokenizer,
+)
 
 from utils import get_logger
 
@@ -11,10 +15,10 @@ from utils import get_logger
 logger = get_logger(__name__)
 
 
-def __get_dataset(
+def __get_imdb_dataset(
     tokenizer: AutoTokenizer
 ) -> tuple[dict[str, torch.Tensor], torch.Tensor]:
-    dataset = datasets.load_dataset("imdb")["test"][:10]
+    dataset = datasets.load_dataset("imdb")["test"]
     labels = dataset["label"]
 
     logger.info(dataset)
@@ -29,12 +33,31 @@ def __get_dataset(
     return dataset, labels
 
 
+def __get_qa_dataset(
+    tokenizer: AutoTokenizer
+) -> tuple[dict[str, torch.Tensor], list[str]]:
+    dataset = datasets.load_dataset("truthful_qa", "generation")["validation"]
+
+    logger.info(dataset)
+
+    question = tokenizer(
+        dataset["question"],
+        padding=True,
+        truncation=True,
+        return_tensors="pt",
+    )
+
+    answer = dataset["best_answer"]
+
+    return question, answer
+
+
 def imdb_feature_comparison(
-    model1: AutoModel,
-    model2: AutoModel,
+    model1: AutoModelForSequenceClassification,
+    model2: AutoModelForSequenceClassification,
     tokenizer: AutoTokenizer,
 ) -> None:
-    dataset, _ = __get_dataset(tokenizer)
+    dataset, _ = __get_imdb_dataset(tokenizer)
 
     similarities = []
 
@@ -69,8 +92,8 @@ def imdb_feature_comparison(
     logger.info(f"{similarity=}")
 
 
-def imdb_benchmark(model: AutoModel, tokenizer: AutoTokenizer) -> None:
-    dataset, labels = __get_dataset(tokenizer)
+def imdb_benchmark(model: AutoModelForCausalLM, tokenizer: AutoTokenizer) -> None:
+    dataset, labels = __get_imdb_dataset(tokenizer)
 
     predictions = []
 
@@ -104,3 +127,11 @@ def imdb_benchmark(model: AutoModel, tokenizer: AutoTokenizer) -> None:
     logger.info(f"{f1=}")
     logger.info(f"{precision=}")
     logger.info(f"{recall=}")
+
+
+def qa_benchmark(model: AutoModelForCausalLM, tokenizer: AutoTokenizer) -> None:
+    tokenizer.pad_token = tokenizer.eos_token
+
+    question, answer = __get_qa_dataset(tokenizer)
+
+    print(question.keys())
