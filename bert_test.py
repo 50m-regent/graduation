@@ -1,8 +1,7 @@
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
-from benchmark import imdb_benchmark, imdb_feature_comparison
+from benchmark import imdb_feature_comparison
 from utils import get_logger
-
 
 logger = get_logger(__name__)
 
@@ -16,9 +15,9 @@ def main() -> None:
     )
     tokenizer = AutoTokenizer.from_pretrained("google-bert/bert-base-uncased")
 
-    imdb_feature_comparison(model1, model2, tokenizer)
+    logger.info(model1)
 
-    imdb_benchmark(model1, tokenizer)
+    imdb_feature_comparison(model1, model2, tokenizer)
 
 
 if __name__ == "__main__":
