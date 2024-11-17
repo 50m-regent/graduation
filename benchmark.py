@@ -11,7 +11,6 @@ from transformers import (
 
 from utils import get_logger
 
-
 logger = get_logger(__name__)
 
 
@@ -33,23 +32,16 @@ def __get_imdb_dataset(
     return dataset, labels
 
 
-def __get_qa_dataset(
-    tokenizer: AutoTokenizer
-) -> tuple[dict[str, torch.Tensor], list[str]]:
-    dataset = datasets.load_dataset("truthful_qa", "generation")["validation"]
+def __get_qa_dataset(tokenizer: AutoTokenizer) -> list[dict[str, torch.Tensor]]:
+    dataset = datasets.load_dataset("truthfulqa/truthful_qa", "generation")[
+        "validation"
+    ]
 
     logger.info(dataset)
 
-    question = tokenizer(
-        dataset["question"],
-        padding=True,
-        truncation=True,
-        return_tensors="pt",
-    )
-
-    answer = dataset["best_answer"]
-
-    return question, answer
+    return [
+        tokenizer(question, return_tensors="pt") for question in dataset["question"]
+    ]
 
 
 def imdb_feature_comparison(
@@ -130,8 +122,15 @@ def imdb_benchmark(model: AutoModelForCausalLM, tokenizer: AutoTokenizer) -> Non
 
 
 def qa_benchmark(model: AutoModelForCausalLM, tokenizer: AutoTokenizer) -> None:
-    tokenizer.pad_token = tokenizer.eos_token
+    tokenizer.pad_token_id = tokenizer.eos_token_id
+    questions = __get_qa_dataset(tokenizer)
 
-    question, answer = __get_qa_dataset(tokenizer)
+    losses = []
+    with torch.no_grad(), logging_redirect_tqdm(loggers=[logger]):
+        for inputs in tqdm(questions):
+            output = model(**inputs, labels=inputs["input_ids"])
 
-    print(question.keys())
+            losses.append(torch.exp(output.loss))
+
+    perplexity = torch.asarray(losses).mean()
+    logger.info(f"{perplexity=}")

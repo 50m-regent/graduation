@@ -1,6 +1,6 @@
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
-from benchmark import imdb_benchmark, imdb_feature_comparison
+from benchmark import imdb_feature_comparison
 from utils import get_logger
 
 logger = get_logger(__name__)
@@ -18,8 +18,6 @@ def main() -> None:
     logger.info(model1)
 
     imdb_feature_comparison(model1, model2, tokenizer)
-
-    imdb_benchmark(model1, tokenizer)
 
 
 if __name__ == "__main__":
