@@ -1,7 +1,7 @@
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
-from benchmark import qa_benchmark
+from benchmark import qa_feature_comparison
 from utils import get_logger
 
 logger = get_logger(__name__)
@@ -20,14 +20,16 @@ class ZeroPE(torch.nn.Module):
 
 
 def main() -> None:
-    model = AutoModelForCausalLM.from_pretrained("gpt2")
+    model1 = AutoModelForCausalLM.from_pretrained("gpt2")
+    model2 = AutoModelForCausalLM.from_pretrained("gpt2")
     tokenizer = AutoTokenizer.from_pretrained("gpt2")
 
-    model.transformer.wpe = ZeroPE(768)
+    model2.transformer.wpe = ZeroPE(768)
 
-    logger.info(model)
+    logger.info(model1)
+    logger.info(model2)
 
-    qa_benchmark(model, tokenizer)
+    qa_feature_comparison(model1, model2, tokenizer)
 
 
 if __name__ == "__main__":

@@ -121,6 +121,29 @@ def imdb_benchmark(model: AutoModelForCausalLM, tokenizer: AutoTokenizer) -> Non
     logger.info(f"{recall=}")
 
 
+def qa_feature_comparison(
+    model1: AutoModelForCausalLM, model2: AutoModelForCausalLM, tokenizer: AutoTokenizer
+) -> None:
+    tokenizer.pad_token_id = tokenizer.eos_token_id
+    questions = __get_qa_dataset(tokenizer)
+
+    similarities = []
+    with torch.no_grad(), logging_redirect_tqdm(loggers=[logger]):
+        for inputs in tqdm(questions):
+            feature1 = model1.transformer(**inputs).last_hidden_state
+            feature2 = model2.transformer(**inputs).last_hidden_state
+
+            similarity = (
+                torch.cosine_similarity(feature1, feature2, dim=2).mean(dim=1).item()
+            )
+
+            similarities.append(similarity)
+
+    similarity = torch.asarray(similarities).mean()
+
+    logger.info(f"{similarity=}")
+
+
 def qa_benchmark(model: AutoModelForCausalLM, tokenizer: AutoTokenizer) -> None:
     tokenizer.pad_token_id = tokenizer.eos_token_id
     questions = __get_qa_dataset(tokenizer)
