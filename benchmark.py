@@ -1,3 +1,5 @@
+from typing import Callable
+
 import datasets
 import torch
 from sklearn import metrics
@@ -121,16 +123,22 @@ def imdb_benchmark(model: AutoModelForCausalLM, tokenizer: AutoTokenizer) -> Non
     logger.info(f"{recall=}")
 
 
-def qa_benchmark(model: AutoModelForCausalLM, tokenizer: AutoTokenizer) -> None:
+def qa_benchmark(
+    model: AutoModelForCausalLM,
+    tokenizer: AutoTokenizer,
+    change_mask: Callable | None = None,
+) -> None:
     tokenizer.pad_token_id = tokenizer.eos_token_id
     questions = __get_qa_dataset(tokenizer)
 
     losses = []
     with torch.no_grad(), logging_redirect_tqdm(loggers=[logger]):
         for inputs in tqdm(questions):
-            output = model(**inputs, labels=inputs["input_ids"])
+            if change_mask is not None:
+                inputs["attention_mask"] = change_mask(inputs["attention_mask"])
+                logger.info(inputs["attention_mask"])
 
-            losses.append(torch.exp(output.loss))
+            losses.append(torch.exp(model(**inputs, labels=inputs["input_ids"]).loss))
 
     perplexity = torch.asarray(losses).mean()
     logger.info(f"{perplexity=}")
