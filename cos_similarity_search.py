@@ -3,7 +3,7 @@ from matplotlib import pyplot
 from tqdm import tqdm
 
 
-N = [2, 4, 8, 16, 32, 64, 128, 256, 512, 1024]
+N = [2, 4, 8, 16, 32, 64, 128, 256, 512, 768, 1024]
 SAMPLE_SIZE = 1000000
 
 pyplot.rcParams["text.usetex"] = True
@@ -21,6 +21,7 @@ def search_cos_similarity(n: int) -> None:
     pyplot.legend()
 
     pyplot.savefig(f"outputs/cos_similarity/{n}.pdf", bbox_inches="tight")
+    pyplot.savefig(f"outputs/cos_similarity/{n}.png", bbox_inches="tight")
     pyplot.cla()
 
 
