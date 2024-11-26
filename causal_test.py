@@ -1,7 +1,7 @@
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
-from benchmark import qa_feature_comparison
+from benchmark import qa_benchmark
 from utils import get_logger
 
 logger = get_logger(__name__)
@@ -33,7 +33,7 @@ def main() -> None:
     logger.info(model1)
     logger.info(model2)
 
-    qa_feature_comparison(model1, model2, tokenizer)
+    qa_benchmark(model=model1, tokenizer=tokenizer, change_mask=change_mask)
 
 
 if __name__ == "__main__":
