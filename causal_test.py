@@ -19,6 +19,10 @@ class ZeroPE(torch.nn.Module):
         )
 
 
+def change_mask(mask: torch.Tensor) -> torch.Tensor:
+    return torch.arange(0.1, 1.001, 0.9 / (mask.shape[1] - 1)).unsqueeze(dim=0)
+
+
 def main() -> None:
     model = AutoModelForCausalLM.from_pretrained("gpt2")
     tokenizer = AutoTokenizer.from_pretrained("gpt2")
@@ -27,7 +31,7 @@ def main() -> None:
 
     logger.info(model)
 
-    qa_benchmark(model, tokenizer)
+    qa_benchmark(model, tokenizer, change_mask=change_mask)
 
 
 if __name__ == "__main__":
