@@ -82,7 +82,6 @@ def imdb_feature_comparison(
             similarities.append(similarity)
 
     similarity = torch.asarray(similarities).mean()
-
     logger.info(f"{similarity=}")
 
 
@@ -142,26 +141,35 @@ def qa_feature_comparison(
             similarities.append(similarity)
 
     similarity = torch.asarray(similarities).mean()
-
     logger.info(f"{similarity=}")
 
 
 def qa_benchmark(
     model: AutoModelForCausalLM,
     tokenizer: AutoTokenizer,
-    change_mask: Callable | None = None,
+    change_mask: Callable = lambda x: x,
 ) -> None:
     tokenizer.pad_token_id = tokenizer.eos_token_id
     questions = __get_qa_dataset(tokenizer)
 
     losses = []
+    similarities = []
     with torch.no_grad(), logging_redirect_tqdm(loggers=[logger]):
         for inputs in tqdm(questions):
-            if change_mask is not None:
-                inputs["attention_mask"] = change_mask(inputs["attention_mask"])
-                logger.info(inputs["attention_mask"])
+            feature1 = model.transformer(**inputs).last_hidden_state
+
+            inputs["attention_mask"] = change_mask(inputs["attention_mask"])
+            logger.info(inputs["attention_mask"])
+
+            feature2 = model.transformer(**inputs).last_hidden_state
 
             losses.append(torch.exp(model(**inputs, labels=inputs["input_ids"]).loss))
+            similarities.append(
+                torch.cosine_similarity(feature1, feature2, dim=2).mean(dim=1).item()
+            )
 
     perplexity = torch.asarray(losses).mean()
     logger.info(f"{perplexity=}")
+
+    similarity = torch.asarray(similarities).mean()
+    logger.info(f"{similarity=}")
