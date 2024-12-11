@@ -18,10 +18,14 @@ def search_cos_similarity(n: int) -> None:
     pyplot.hist(cos_similarity, bins=100, range=(-1, 1), density=True, label=f"$n={n}$")
 
     pyplot.xlim(-1, 1)
-    pyplot.legend()
+    # pyplot.legend()
 
-    pyplot.savefig(f"outputs/cos_similarity/{n}.pdf", bbox_inches="tight")
-    pyplot.savefig(f"outputs/cos_similarity/{n}.png", bbox_inches="tight")
+    pyplot.savefig(
+        f"outputs/cos_similarity/{n}.pdf", bbox_inches="tight", transparent=True
+    )
+    pyplot.savefig(
+        f"outputs/cos_similarity/{n}.png", bbox_inches="tight", transparent=True
+    )
     pyplot.cla()
 
 
