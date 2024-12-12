@@ -15,7 +15,7 @@ def main() -> None:
     model = AutoModelForCausalLM.from_pretrained("gpt2")
 
     with torch.no_grad():
-        token_ids = torch.arange(0, 50257, dtype=torch.long).unsqueeze(0)
+        token_ids = torch.arange(0, MAX_ID, dtype=torch.long).unsqueeze(0)
         token_embeddings = model.transformer.wte(token_ids)
 
     logger.info(token_embeddings.shape)

@@ -23,6 +23,10 @@ def change_mask(mask: torch.Tensor) -> torch.Tensor:
     return torch.arange(0.1, 1.001, 0.9 / (mask.shape[1] - 1)).unsqueeze(dim=0)
 
 
+def no_mask(mask: torch.Tensor) -> torch.Tensor:
+    return torch.zeros_like(mask)
+
+
 def main() -> None:
     model1 = AutoModelForCausalLM.from_pretrained("gpt2")
     model2 = AutoModelForCausalLM.from_pretrained("gpt2")
