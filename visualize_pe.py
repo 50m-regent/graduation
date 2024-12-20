@@ -21,16 +21,16 @@ def main() -> None:
     logger.info(position_embeddings.shape)
 
     pyplot.figure()
-    seaborn.heatmap(position_embeddings[0].transpose(0, 1))
+    seaborn.heatmap(position_embeddings[0])
 
-    pyplot.xlabel("position")
-    pyplot.ylabel("embedding")
+    pyplot.ylabel("position")
+    pyplot.xlabel("embedding")
 
-    pyplot.xticks(
+    pyplot.yticks(
         ticks=[0, 128, 256, 384, 512, 640, 768, 896, 1024],
         labels=[0, 128, 256, 384, 512, 640, 768, 896, 1024],
     )
-    pyplot.yticks(
+    pyplot.xticks(
         ticks=[0, 128, 256, 384, 512, 640, 768],
         labels=[0, 128, 256, 384, 512, 640, 768],
     )

@@ -21,10 +21,10 @@ def main() -> None:
     logger.info(token_embeddings.shape)
 
     pyplot.figure()
-    seaborn.heatmap(token_embeddings[0].transpose(0, 1))
+    seaborn.heatmap(token_embeddings[0])
 
-    pyplot.xlabel("token")
-    pyplot.ylabel("embedding")
+    pyplot.ylabel("token")
+    pyplot.xlabel("embedding")
 
     """
     pyplot.xticks(
@@ -32,7 +32,7 @@ def main() -> None:
         labels=[0, 128, 256, 384, 512, 640, 768, 896, 1024],
     )
     """
-    pyplot.yticks(
+    pyplot.xticks(
         ticks=[0, 128, 256, 384, 512, 640, 768],
         labels=[0, 128, 256, 384, 512, 640, 768],
     )

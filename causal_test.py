@@ -3,20 +3,9 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 
 from benchmark import qa_benchmark
 from utils import get_logger
+from zero_pe import ZeroPE
 
 logger = get_logger(__name__)
-
-
-class ZeroPE(torch.nn.Module):
-    def __init__(self, embed_dim: int) -> None:
-        super().__init__()
-
-        self.embed_dim = embed_dim
-
-    def forward(self, position_ids: torch.Tensor) -> torch.Tensor:
-        return torch.zeros(
-            (position_ids.shape[0], position_ids.shape[1], self.embed_dim)
-        )
 
 
 def change_mask(mask: torch.Tensor) -> torch.Tensor:
@@ -37,7 +26,7 @@ def main() -> None:
     logger.info(model1)
     logger.info(model2)
 
-    qa_benchmark(model=model1, tokenizer=tokenizer, change_mask=change_mask)
+    qa_benchmark(model=model1, tokenizer=tokenizer)
 
 
 if __name__ == "__main__":
